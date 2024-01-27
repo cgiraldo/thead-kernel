@@ -59,3 +59,5 @@ obj-$(CONFIG_XILINX_SDFEC)	+= xilinx_sdfec.o
 obj-$(CONFIG_HISI_HIKEY_USB)	+= hisi_hikey_usb.o
 obj-$(CONFIG_UID_SYS_STATS)	+= uid_sys_stats.o
 obj-$(CONFIG_LIGHT_DSMART_CARD)	+= dsmart_card.o
+obj-$(CONFIG_USBEN)		+= usb_en.o
+obj-$(CONFIG_MCU_HC32FX)		+= hc32fx/

@@ -262,13 +262,22 @@ static int __i2c_hid_command(struct i2c_client *client,
 	if (wait)
 		set_bit(I2C_HID_RESET_PENDING, &ihid->flags);
 
-	ret = i2c_transfer(client->adapter, msg, msg_num);
+	static int retry = 10;
+	while(retry) {
+		ret = i2c_transfer(client->adapter, msg, msg_num);
 
-	if (data_len > 0)
-		clear_bit(I2C_HID_READ_PENDING, &ihid->flags);
+		if (data_len > 0)
+			clear_bit(I2C_HID_READ_PENDING, &ihid->flags);
 
-	if (ret != msg_num)
+		if (ret == msg_num) {
+			break;
+		}
+		retry--;
+	}
+
+	if (ret != msg_num) {
 		return ret < 0 ? ret : -EIO;
+	}
 
 	ret = 0;
 

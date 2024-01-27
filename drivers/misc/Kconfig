@@ -487,6 +487,10 @@ config LIGHT_DSMART_CARD
 	help
 	The DCD SMART CARD IP driver which follwing the ISO7816 Protocl on THEAD Light SoCs
 
+config USBEN
+	tristate "TVI1432V project usb enable item"
+	default y
+
 source "drivers/misc/c2port/Kconfig"
 source "drivers/misc/eeprom/Kconfig"
 source "drivers/misc/cb710/Kconfig"
@@ -502,4 +506,5 @@ source "drivers/misc/ocxl/Kconfig"
 source "drivers/misc/cardreader/Kconfig"
 source "drivers/misc/habanalabs/Kconfig"
 source "drivers/misc/uacce/Kconfig"
+source "drivers/misc/hc32fx/Kconfig"
 endmenu

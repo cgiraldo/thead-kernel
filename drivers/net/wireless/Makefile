@@ -35,3 +35,4 @@ obj-$(CONFIG_RTL8723DS) += rtl8723ds/
 obj-$(CONFIG_BCMDHD) += bcmdhd.101.10.361.x/
 
 obj-$(CONFIG_AIC_WLAN_SUPPORT) += aic8800/
+obj-$(CONFIG_RTL8822CS) += rtl8822cs/

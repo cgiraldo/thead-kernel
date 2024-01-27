@@ -581,6 +581,7 @@ static int light_pinctrl_probe(struct platform_device *pdev)
 	struct light_pinctrl *priv;
 	struct light_pinctrl_soc_info *info;
 	struct resource *res;
+	unsigned int mux;
 	int ret;
 
 	info = (struct light_pinctrl_soc_info *)of_device_get_match_data(&pdev->dev);
@@ -639,6 +640,15 @@ static int light_pinctrl_probe(struct platform_device *pdev)
 	if (!priv->pctl) {
 		dev_err(&pdev->dev, "could not register light pinctrl driver\n");
 		return -EINVAL;
+	}
+
+	if(info->type == LIGHT_FM_AUDIO)
+	{
+		// AUDIO_PA13_GPIO_SEL [13]
+		mux = readl(priv->base);
+		mux &= ~(0x1 << 13);
+		mux |= (0x1 << 13);
+		writel(mux, priv->base);
 	}
 
 	dev_info(&pdev->dev, "initialized light pinctrl driver\n");

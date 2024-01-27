@@ -24,6 +24,16 @@ config INPUT
 	  To compile this driver as a module, choose M here: the
 	  module will be called input.
 
+config INPUT_FINGERPRINT
+	default y
+	help
+	  fingerprint
+
+config INPUT_HALL
+	default y
+	help
+	  hall
+
 if INPUT
 
 config INPUT_LEDS
@@ -210,6 +220,10 @@ source "drivers/input/serio/Kconfig"
 source "drivers/input/gameport/Kconfig"
 
 endmenu
+
+source "drivers/input/fingerprint/Kconfig"
+
+source "drivers/input/hall/Kconfig"
 
 endmenu
 

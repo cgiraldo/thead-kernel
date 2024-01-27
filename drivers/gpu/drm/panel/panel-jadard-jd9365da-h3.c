@@ -212,20 +212,20 @@ static const struct drm_panel_funcs panel_funcs = {
 };
 
 static const struct drm_display_mode jadard_default_mode = {
-	.clock		= 76000,
-	.hdisplay	= 800,
-	.hsync_start	= 800 + 32,
-	.hsync_end	= 800 + 32 + 8,
-	.htotal		= 800 + 32 + 8 + 32,
+	.clock		= 152840,
+	.hdisplay	= 1920,
+	.hsync_start	= 1920 + 140,
+	.hsync_end	= 1920 + 140 + 160,
+	.htotal		= 1920 + 140 + 160 + 30,
 
-	.vdisplay	= 1280,
-	.vsync_start	= 1280 + 16,
-	.vsync_end	= 1280 + 16 + 8,
-	.vtotal		= 1280 + 16 + 8 + 16,
+	.vdisplay	= 1080,
+	.vsync_start	= 1080 + 18,
+	.vsync_end	= 1080 + 18 + 28,
+	.vtotal		= 1080 + 18 + 28 + 6,
 
-	.width_mm	= 62,
-	.height_mm	= 110,
-	.flags      = DRM_MODE_FLAG_NHSYNC | DRM_MODE_FLAG_NVSYNC,
+	.width_mm	= 110,
+	.height_mm	= 62,
+	.flags          = DRM_MODE_FLAG_NHSYNC | DRM_MODE_FLAG_NVSYNC,
 };
 
 

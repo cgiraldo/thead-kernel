@@ -29,14 +29,14 @@
                         sound-dai = <&es7210_audio_codec>;
                 };
         };
-        simple-audio-card,dai-link@2 {          /* I2S - AUDIO SYS CODEC 8156*/
+        simple-audio-card,dai-link@2 { /* I2S - AUDIO SYS CODEC 8388*/
                 reg = <2>;
                 format = "i2s";
                 cpu {
                         sound-dai = <&i2s1 0>;
                 };
                 codec {
-                        sound-dai = <&es8156_audio_codec>;
+                        sound-dai = <&es8388_audio_codec>;
                 };
         };
 };
