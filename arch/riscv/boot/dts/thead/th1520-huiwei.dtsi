@@ -385,7 +385,7 @@
 
 	gpio-keys {
 		compatible = "gpio-keys";
-		pinctrl-0 = <&pinctrl_volume &pinctrl_sleep>;
+		pinctrl-0 = <&pinctrl_volume &pinctrl_pw>;
 		pinctrl-names = "default";
 		key-volumedown {
 			label = "Volume Down Key";
@@ -400,12 +400,12 @@
 			gpios = <&gpio2_porta 25 0x1>;
 		};
 
-		key-wake {
-			label = "Wake Key";
+		kkey-pw{
+			label = "power Key";
 			wakeup-source;
-			linux,code = <KEY_WAKEUP>;
+			linux,code = <KEY_POWER>;
 			debounce-interval = <1>;
-			gpios = <&ao_gpio_porta 2 0x1>;
+			gpios = <&ao_gpio_porta 6 0x1>;
 		};
 	};
 
@@ -877,6 +877,7 @@
 		compatible = "everest,es8388", "everest,es8323";
 		reg = <0x11>;
 		sound-name-prefix = "ES8388";
+		headset-detect = <&rk_headset>;
 		AVDD-supply = <&soc_aud_3v3_en_reg>;
 		DVDD-supply = <&soc_aud_1v8_en_reg>;
 		PVDD-supply = <&soc_aud_1v8_en_reg>;
@@ -1451,16 +1452,19 @@
 				thead,pins = < FM_AUDIO_PA30 LIGHT_PIN_FUNC_0 0x000 >;
 			};
 			touchpad_irq_gpio: touchpad-irq-gpio {
-				thead,pins = < FM_CPU_JTG_TDI LIGHT_PIN_FUNC_3 0x20a >;
+				thead,pins = < FM_CPU_JTG_TDI LIGHT_PIN_FUNC_3 0x238 >;
 			};
 			hidkey_irq_gpio: hidkey-irq-gpio {
-				thead,pins = < FM_CPU_JTG_TMS LIGHT_PIN_FUNC_3 0x20a >;
+				thead,pins = < FM_CPU_JTG_TMS LIGHT_PIN_FUNC_3 0x238 >;
 			};
 			pinctrl_audiopa26: audiopa26 {
 				thead,pins = < FM_AOGPIO_15 LIGHT_PIN_FUNC_0 0x000 >;
 			};
 			mh248_irq_gpio: mh248-irq-gpio {
-				thead,pins = < FM_CPU_JTG_TCLK LIGHT_PIN_FUNC_3 0x20a >;
+				thead,pins = < FM_CPU_JTG_TCLK LIGHT_PIN_FUNC_3 0x238 >;
+			};
+			pinctrl_pw: pw{
+				thead,pins = < FM_CPU_JTG_TRST 0x3 0x238>;
 			};
 	};
 };
@@ -1669,6 +1673,7 @@
 		reg = <0x15>;
 		hid-descr-addr = <0x20>;
 		hid-support-wakeup;
+		wakeup-source;
 	};
 };
 
@@ -1714,6 +1719,7 @@
 		pinctrl-0 = <&touchpad_irq_gpio>;
 		reg = <0x2c>;
 		hid-descr-addr = <0x20>;
+		wakeup-source;
 	};
 };
 

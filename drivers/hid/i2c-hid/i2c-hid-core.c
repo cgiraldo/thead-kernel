@@ -1175,6 +1175,9 @@ static int i2c_hid_probe(struct i2c_client *client,
 		goto err_mem_free;
 	}
 
+	if (client->dev.of_node && of_property_read_bool(client->dev.of_node, "wakeup-source"))
+		device_init_wakeup(&client->dev, 1);
+
 	return 0;
 
 err_mem_free:
@@ -1198,6 +1201,10 @@ static int i2c_hid_remove(struct i2c_client *client)
 	hid = ihid->hid;
 	hid_destroy_device(hid);
 
+	if (device_may_wakeup(&client->dev))
+		device_init_wakeup(&client->dev, 0);
+
+
 	free_irq(client->irq, ihid);
 
 	if (ihid->bufsize)
@@ -1212,6 +1219,9 @@ static int i2c_hid_remove(struct i2c_client *client)
 static void i2c_hid_shutdown(struct i2c_client *client)
 {
 	struct i2c_hid *ihid = i2c_get_clientdata(client);
+
+	if (device_may_wakeup(&client->dev))
+		device_init_wakeup(&client->dev, 0);
 
 	i2c_hid_set_power(client, I2C_HID_PWR_SLEEP);
 	free_irq(client->irq, ihid);
@@ -1237,7 +1247,7 @@ static int i2c_hid_suspend(struct device *dev)
 	/* Save some power */
 	i2c_hid_set_power(client, I2C_HID_PWR_SLEEP);
 
-	disable_irq(client->irq);
+	// disable_irq(client->irq);
 
 	if (device_may_wakeup(&client->dev)) {
 		wake_status = enable_irq_wake(client->irq);
@@ -1279,7 +1289,7 @@ static int i2c_hid_resume(struct device *dev)
 				wake_status);
 	}
 
-	enable_irq(client->irq);
+	// enable_irq(client->irq);
 
 	/* Instead of resetting device, simply powers the device on. This
 	 * solves "incomplete reports" on Raydium devices 2386:3118 and

@@ -30,6 +30,7 @@
 #include <linux/gpio.h>
 #include <linux/of_gpio.h>
 #include <linux/rk_headset.h>
+#include <linux/extcon-provider.h>
 
 #include "es8323.h"
 
@@ -60,6 +61,7 @@ extern int es7243_start(void);
 // #ifdef CONFIG_RK_HEADSET
 // extern int rk_headset_get_headset(void);
 // #endif
+struct es8323_priv *g_es8323 = NULL;
 
 #define NR_SUPPORTED_MCLK_LRCK_RATIOS 5
 static const unsigned int supported_mclk_lrck_ratios[NR_SUPPORTED_MCLK_LRCK_RATIOS] = {
@@ -150,6 +152,33 @@ static int es8323_codec_ctl_gpio(struct es8323_priv *es8323,
 
 	return 0;
 }
+
+static int es8323_headset_switch(struct notifier_block *nb,
+                                 unsigned long event, void *ptr) {
+        struct extcon_dev *edev = (struct extcon_dev *)ptr;
+        bool hp_in;
+        DBG("enter :%s \n", __func__);
+        if (g_es8323 == NULL || edev == NULL) {
+                return NOTIFY_DONE;
+        }
+        hp_in = extcon_get_state(edev, EXTCON_JACK_HEADPHONE);
+
+        if (hp_in) {
+                snd_soc_component_write(g_es8323->component, ES8323_ADCCONTROL2, 0x00);
+                es8323_codec_ctl_gpio(g_es8323, CODEC_SET_SPK, 0);
+                es8323_codec_ctl_gpio(g_es8323, CODEC_SET_HP, 1);
+        } else {
+                snd_soc_component_write(g_es8323->component, ES8323_ADCCONTROL2, 0x50);
+                es8323_codec_ctl_gpio(g_es8323, CODEC_SET_SPK, 1);
+                es8323_codec_ctl_gpio(g_es8323, CODEC_SET_HP, 0);
+        }
+
+        return NOTIFY_OK;
+}
+
+static struct notifier_block es8323_headset_nb = {
+        .notifier_call = es8323_headset_switch,
+};
 
 /* ----------------------------------------------------------------- */
 /**
@@ -744,10 +773,10 @@ static int es8323_pcm_startup(struct snd_pcm_substream *substream,
 		#ifdef CONFIG_RK_HEADSET
 		if(!rk_headset_get_headset()) {
 			DBG("headset out, select lin2\n");
-			snd_soc_component_write(component, ES8323_DACCONTROL16, 0x09);
+                        snd_soc_component_write(component, ES8323_ADCCONTROL2, 0x50);
 		} else {
-			DBG("headset out, select lin1\n");
-			snd_soc_component_write(component, ES8323_DACCONTROL16, 0x00);
+			DBG("headset in, select lin1\n");
+			snd_soc_component_write(component, ES8323_ADCCONTROL2, 0x00);
 		}
 		#endif
 		break;
@@ -1012,6 +1041,25 @@ static int es8323_probe(struct snd_soc_component *component)
 		return ret;
 	}
 
+        struct device_node *headset_det_node = of_parse_phandle(es8323->np, "headset-detect", 0);
+        if (headset_det_node) {
+                struct extcon_dev *extcon = extcon_find_edev_by_node(headset_det_node);
+                of_node_put(headset_det_node);
+                if (!IS_ERR(extcon)) {
+                        ret = extcon_register_notifier(extcon, EXTCON_JACK_HEADPHONE,&es8323_headset_nb);
+                        if (ret) {
+                                dev_err(component->dev, "Failed to register notifier for headset-detection\n");
+                        }
+                }else {
+                        if (PTR_ERR(extcon) == -EPROBE_DEFER)
+                                return -EPROBE_DEFER;
+                        dev_err(component->dev, "Failed to get extcon device for headset-detection\n");
+                        return PTR_ERR(extcon);
+                }
+        }else {
+                dev_warn(component->dev, "headset-detect phandle not specified in DTS\n");
+        }
+
 	snd_soc_component_write(component, 0x01, 0x60);
 	snd_soc_component_write(component, 0x02, 0xF3);
 	snd_soc_component_write(component, 0x02, 0xF0);
@@ -1052,12 +1100,20 @@ static int es8323_probe(struct snd_soc_component *component)
 	snd_soc_component_write(component, 0x04, 0x3C);
 
 	es8323_set_bias_level(component, SND_SOC_BIAS_STANDBY);
+        g_es8323 = es8323;
+        DBG("%s : successfully !\n",__func__);
 	return 0;
 }
 
 static void es8323_remove(struct snd_soc_component *component)
 {
 	es8323_set_bias_level(component, SND_SOC_BIAS_OFF);
+        struct extcon_dev *extcon = extcon_get_edev_by_phandle(component->dev, 0);
+        if (!IS_ERR(extcon)) {
+                extcon_unregister_notifier(extcon, EXTCON_JACK_HEADPHONE,
+                                   &es8323_headset_nb);
+        }
+        g_es8323 = NULL;
 }
 
 static const struct snd_soc_component_driver soc_codec_dev_es8323 = {
