@@ -68,17 +68,17 @@ static irqreturn_t hall_mh248_interrupt(int irq, void *dev_id)
 	int gpio_value = 0;
 
 	gpio_value = gpio_get_value(mh248->gpio_pin);
-	if ((gpio_value != mh248->active_value) &&
-	    (mh248->is_suspend == 0)) {
-		input_report_key(mh248->hall_input, KEY_SLEEP, 1);
+	if ((gpio_value != mh248->active_value) ) {
+		//input_report_key(mh248->hall_input, KEY_SLEEP, 1);
+		//input_sync(mh248->hall_input);
+		//input_report_key(mh248->hall_input, KEY_SLEEP, 0);
+		input_report_switch(mh248->hall_input, SW_LID, 1);
 		input_sync(mh248->hall_input);
-		input_report_key(mh248->hall_input, KEY_SLEEP, 0);
-		input_sync(mh248->hall_input);
-	} else if ((gpio_value == mh248->active_value) &&
-		   (mh248->is_suspend == 1)) {
-		input_report_key(mh248->hall_input, KEY_WAKEUP, 1);
-		input_sync(mh248->hall_input);
-		input_report_key(mh248->hall_input, KEY_WAKEUP, 0);
+	} else if ((gpio_value == mh248->active_value) ) {
+		//input_report_key(mh248->hall_input, KEY_WAKEUP, 1);
+		//input_sync(mh248->hall_input);
+		//input_report_key(mh248->hall_input, KEY_WAKEUP, 0);
+		input_report_switch(mh248->hall_input, SW_LID, 0);
 		input_sync(mh248->hall_input);
 	}
 
@@ -135,8 +135,9 @@ static int hall_mh248_probe(struct platform_device *pdev)
 		return -ENOMEM;
 	}
 	mh248->hall_input->name = "hall wake key";
-	input_set_capability(mh248->hall_input, EV_KEY, KEY_SLEEP);
-	input_set_capability(mh248->hall_input, EV_KEY, KEY_WAKEUP);
+	//input_set_capability(mh248->hall_input, EV_KEY, KEY_SLEEP);
+	//input_set_capability(mh248->hall_input, EV_KEY, KEY_WAKEUP);
+	input_set_capability(mh248->hall_input, EV_SW, SW_LID);
 
 	ret = input_register_device(mh248->hall_input);
 	if (ret) {

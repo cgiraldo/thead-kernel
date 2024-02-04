@@ -634,7 +634,7 @@ static int lzo_compress_threadfn(void *data)
 		                          d->wrk);
 		lzo_head = (struct hib_lzo_header *)d->cmp;
 		lzo_head->cmp_len	= d->cmp_len;
-		lzo_head->unc_crc32 = crc32_le(0,d->cmp + LZO_HEADER, d->cmp_len);
+		lzo_head->unc_crc32 = crc32_le(0,d->unc, d->unc_len);
 		atomic_set(&d->stop, 1);
 		wake_up(&d->done);
 	}
@@ -1087,7 +1087,7 @@ static int lzo_decompress_threadfn(void *data)
 		d->ret = lzo1x_decompress_safe(d->cmp + LZO_HEADER, d->cmp_len,
 		                               d->unc, &d->unc_len);
 
-		unc_crc32 = crc32_le(0,d->cmp + LZO_HEADER, d->cmp_len);
+		unc_crc32 = crc32_le(0,d->unc, d->unc_len);
 		if(unc_crc32 != get_header_crc32((struct hib_lzo_header *)&d->cmp) ) {
 			d->crc32_err++;
 		}
@@ -1449,9 +1449,10 @@ int swsusp_mark_sign_retry(void)
 }
 /**
  *      swsusp_check - Check for swsusp signature in the resume device
+ *      @keep_sign : indicate for reset wap signature, for resume used as fast bootup
  */
 
-int swsusp_check(void)
+int swsusp_check(int keep_sign)
 {
 	int error;
 	void *holder;
@@ -1473,13 +1474,13 @@ int swsusp_check(void)
 				swsusp_can_retry = true;
 			else
 				swsusp_can_retry = false;
-
-			memcpy(swsusp_header->sig, swsusp_header->orig_sig, 10);
-			/* Reset swap signature now */
-			error = hib_submit_io(REQ_OP_WRITE, REQ_SYNC,
-						swsusp_resume_block,
-						swsusp_header, NULL);
-
+			if(!keep_sign) {
+				memcpy(swsusp_header->sig, swsusp_header->orig_sig, 10);
+				/* Reset swap signature now */
+				error = hib_submit_io(REQ_OP_WRITE, REQ_SYNC,
+							swsusp_resume_block,
+							swsusp_header, NULL);
+			}
 		} else {
 			error = -EINVAL;
 		}

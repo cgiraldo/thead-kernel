@@ -170,7 +170,7 @@ extern int swsusp_swap_in_use(void);
 #define SF_CRC32_MODE	        4
 
 /* kernel/power/hibernate.c */
-extern int swsusp_check(void);
+extern int swsusp_check(int keep_sign);
 extern void swsusp_free(void);
 extern int swsusp_read(unsigned int *flags_p);
 extern int swsusp_write(unsigned int flags);

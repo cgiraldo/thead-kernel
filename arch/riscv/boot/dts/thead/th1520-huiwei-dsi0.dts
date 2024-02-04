@@ -17,23 +17,23 @@
 	vcc1v8_lontium: vcc1v8-lontium {
 		compatible = "regulator-fixed";
 		enable-active-high;
+		regulator-min-microvolt = <1800000>;
+		regulator-max-microvolt = <1800000>;
 		gpio = <&gpio3_porta 17 GPIO_ACTIVE_HIGH>;
 		pinctrl-names = "default";
 		pinctrl-0 = <&vcc1v8_lontium_pwren>;
-		regulator-name = "vcc1v8_lontium_pwren";
-		regulator-boot-on;
-		regulator-always-on;
+		regulator-name = "vcc1v8-lontium";
 	};
 
 	vcc3v3_edp: vcc3v3-edp {
 		compatible = "regulator-fixed";
 		enable-active-high;
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
 		gpio = <&gpio2_porta 18 GPIO_ACTIVE_HIGH>;
 		pinctrl-names = "default";
 		pinctrl-0 = <&vcc3v3_edp_pwren>;
-		regulator-name = "vcc3v3_edp_pwren";
-		regulator-boot-on;
-		regulator-always-on;
+		regulator-name = "vcc3v3-edp";
 	};
 };
 
@@ -59,19 +59,9 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_i2c3>;
 
-	lt8911exb@29 {
-		status = "okay";
-		compatible = "lontium,lt8911exb";
+	lt8911i2c: lt8911i2c@29{
+		compatible = "i2c,lt8911";
 		reg = <0x29>;
-		lt8911exb,backlight-gpio = <&gpio2_porta 20 GPIO_ACTIVE_HIGH>;
-		lt8911exb,irq-gpio = <&gpio3_porta 16 GPIO_ACTIVE_LOW>;
-		lt8911exb,reset-gpio = <&gpio3_porta 15 GPIO_ACTIVE_LOW>;
-		lt8911exb,rst-delay-ms = <100>;
-		lt8911exb,edp-lane-cnt = <2>;
-		lt8911exb,mipi-lane-cnt = <4>;
-		lt8911exb,edp-depth = <8>; /* 6 or 8 */
-		pinctrl-names = "default";
-		pinctrl-0 = <&lt8911exb_gpios>;
 	};
 };
 
@@ -106,14 +96,19 @@
 
 &dhost_0 {
 	panel0@0 {
-		compatible = "chongzhou,cz101b4001", "jadard,jd9365da-h3";
+		compatible = "i2c_dsi,lt8911";
 		reg = <0>;
-		backlight = <&lcd0_backlight>;
-		reset-gpio = <&gpio2_porta 22 GPIO_ACTIVE_LOW>; /* active low */
+		lt8911,backlight-gpio = <&gpio2_porta 20 GPIO_ACTIVE_HIGH>;
+		lt8911,irq-gpio = <&gpio3_porta 16 GPIO_ACTIVE_LOW>;
+		lt8911,reset-gpio = <&gpio3_porta 15 GPIO_ACTIVE_LOW>;
+		lt8911,rst-delay-ms = <10>;
+		lt8911,edp-lane-cnt = <2>;
+		lt8911,mipi-lane-cnt = <4>;
+		lt8911,edp-depth = <8>; /* 6 or 8 */
+		pinctrl-names = "default";
+		pinctrl-0 = <&lt8911exb_gpios>;
 		hsvcc-supply = <&vcc1v8_lontium>;
 		vspn3v3-supply = <&vcc3v3_edp>;
-		pinctrl-names = "default";
-		pinctrl-0 = <&dsi_reset_gpio>;
 
 		port {
 			panel0_in: endpoint {
