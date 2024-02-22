@@ -11,6 +11,7 @@
 #define LT_8911_I2C_ADDR	0x45
 
 static struct i2c_mipi_dsi *g_lt8911_mipi_dsi = NULL;
+static bool g_is_std_suspend __nosavedata;
 
 static const struct drm_display_mode lt8911_default_mode = {
 	.clock		= 152840,
@@ -502,6 +503,11 @@ static int panel_prepare(struct drm_panel *panel)
 
 	DBG_FUNC("lt8911exb enter\n");
 
+	if(g_is_std_suspend){
+		DBG_FUNC("lt8911exb prepare under std mode, do not prepare\n");
+		return 0;
+	}
+
 	if(md->client == NULL){
 		DBG_FUNC("lt8911exb i2c client still not ready\n");
 		return 0;
@@ -558,7 +564,12 @@ static int panel_enable(struct drm_panel *panel)
 	int ret = 0;
 	struct i2c_mipi_dsi *md = panel_to_md(panel);
 
-	DBG_FUNC("panel_unprepare enter\n");
+	DBG_FUNC("panel_enable enter\n");
+
+	if(g_is_std_suspend){
+		DBG_FUNC("lt8911exb enable under std mode, do not enable\n");
+		return 0;
+	}
 
 	gpio_set_value(md->backlight_pin, 1);
 
@@ -633,7 +644,6 @@ static int backlight_update(struct backlight_device *bd)
 		}
 
 	md->brightness = brightness;
-	//i2c_md_write(md, REG_PWM, brightness);
 
 	return 0;
 }
@@ -642,6 +652,30 @@ static const struct backlight_ops backlight_ops = {
 	.options = BL_CORE_SUSPENDRESUME,
 	.update_status	= backlight_update,
 };
+
+static int lt8911_pm_notify(struct notifier_block *notify_block,
+			     unsigned long mode, void *unused)
+{
+	struct i2c_mipi_dsi *ctx = container_of(
+		notify_block, struct i2c_mipi_dsi, pm_notify);
+
+	DBG_FUNC("pm_notify: mode (%ld)\n", mode);
+
+	switch (mode) {
+	case PM_HIBERNATION_PREPARE:
+		DBG_FUNC("pm_notify PM_HIBERNATION_PREPARE\n");
+		g_is_std_suspend = true;
+		break;
+	case PM_POST_HIBERNATION:
+		DBG_FUNC("pm_notify PM_HIBERNATION_PREPARE\n");
+		g_is_std_suspend = false;
+		break;
+	default:
+		break;
+	}
+
+	return NOTIFY_DONE;
+}
 
 /**
 static int backlight_init(struct i2c_mipi_dsi *md)
@@ -850,6 +884,8 @@ static int lt8911_dsi_probe(struct mipi_dsi_device *dsi)
 	if(ctx->client == NULL){
 		return -EPROBE_DEFER;
 	}
+
+	g_is_std_suspend = false;
 	
 	ctx->dsi    = dsi;
 	ctx->desc   = &lt8911_panel_data;
@@ -876,6 +912,13 @@ static int lt8911_dsi_probe(struct mipi_dsi_device *dsi)
 
 	//backlight_init(ctx);
 
+	if (IS_ENABLED(CONFIG_PM))
+		ctx->pm_notify.notifier_call = lt8911_pm_notify;
+
+	ret = register_pm_notifier(&ctx->pm_notify);
+	if (ret)
+		DBG_FUNC("register_pm_notifier failed: %d\n", ret);
+
 	ret = mipi_dsi_attach(dsi);
 	if (ret  < 0)
 	{
@@ -888,6 +931,8 @@ static int lt8911_dsi_probe(struct mipi_dsi_device *dsi)
 static int lt8911_dsi_remove(struct mipi_dsi_device *dsi)
 {
 	struct i2c_mipi_dsi *ctx = mipi_dsi_get_drvdata(dsi);
+
+	unregister_pm_notifier(&ctx->pm_notify);
 
 	mipi_dsi_detach(dsi);
 	drm_panel_remove(&ctx->panel);

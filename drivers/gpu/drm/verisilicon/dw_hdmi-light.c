@@ -158,7 +158,7 @@ static int dw_hdmi_light_probe(struct platform_device *pdev)
 
 static int dw_hdmi_light_remove(struct platform_device *pdev)
 {
-	component_del(&pdev->dev, &dw_hdmi_light_ops);
+		component_del(&pdev->dev, &dw_hdmi_light_ops);
 
 	return 0;
 }
@@ -181,10 +181,10 @@ static int hdmi_runtime_resume(struct device *dev)
 #ifdef CONFIG_PM_SLEEP
 static int hdmi_resume(struct device *dev)
 {
-       struct light_hdmi *hdmi = dev_get_drvdata(dev);
-        dev_info(dev,"hdmi resume\n");
-        dw_hdmi_resume(hdmi->dw_hdmi);
-       return 0;
+	struct light_hdmi *hdmi = dev_get_drvdata(dev);
+	dev_info(dev,"hdmi resume\n");
+	dw_hdmi_resume(hdmi->dw_hdmi);
+	return 0;
 }
 #endif
 static const struct dev_pm_ops dw_hdmi_pm_ops = {

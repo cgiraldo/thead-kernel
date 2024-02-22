@@ -28,7 +28,7 @@
 #include <video/mipi_display.h>
 
 
-#if 1
+#if 0
 #define DBG_FUNC(format, x...)		printk(KERN_ERR "[DSI]%s:" format"\n", __func__, ##x)
 #define DBG_PRINT(format, x...)		printk(KERN_ERR "[DSI]" format"\n", ##x)
 #else
@@ -60,6 +60,8 @@ struct i2c_mipi_dsi {
 
 	struct regulator	*hsvcc;
 	struct regulator	*vspn3v3;
+
+	struct notifier_block pm_notify;
 
 	// panel
 	struct drm_panel panel;

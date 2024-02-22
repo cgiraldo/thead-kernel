@@ -34,6 +34,7 @@
 #include <drm/drm_print.h>
 #include <drm/drm_probe_helper.h>
 #include <drm/drm_scdc_helper.h>
+#include <linux/suspend.h>
 
 #include "dw-hdmi-audio.h"
 #include "dw-hdmi-cec.h"
@@ -219,7 +220,11 @@ struct dw_hdmi {
 	hdmi_codec_plugged_cb plugged_cb;
 	struct device *codec_dev;
 	enum drm_connector_status last_connector_result;
+
+	struct notifier_block pm_notify;  /*Used to receive STD notification*/
 };
+
+static bool g_is_hdmi_std_suspend __nosavedata;
 
 #define HDMI_IH_PHY_STAT0_RX_SENSE \
 	(HDMI_IH_PHY_STAT0_RX_SENSE0 | HDMI_IH_PHY_STAT0_RX_SENSE1 | \
@@ -1430,6 +1435,11 @@ static int dw_hdmi_phy_power_on(struct dw_hdmi *hdmi)
 	const struct dw_hdmi_phy_data *phy = hdmi->phy.data;
 	unsigned int i;
 	u8 val;
+
+	if(g_is_hdmi_std_suspend){
+		printk(KERN_INFO "dw_hdmi_phy_power_on under std mod, do not resume\n");
+		return 0;
+	}
 
 	if (phy->gen == 1) {
 		dw_hdmi_phy_enable_powerdown(hdmi, false);
@@ -3284,6 +3294,27 @@ static void dw_hdmi_init_hw(struct dw_hdmi *hdmi)
 		hdmi->phy.ops->setup_hpd(hdmi, hdmi->phy.data);
 }
 
+static int hdmi_light_notify(struct notifier_block *notify_block,
+			     unsigned long mode, void *unused)
+{
+	printk(KERN_INFO"pm_notify: mode (%ld)\n", mode);
+
+	switch (mode) {
+	case PM_HIBERNATION_PREPARE:
+		printk(KERN_INFO"hdmi_pm_notify PM_HIBERNATION_PREPARE\n");
+		g_is_hdmi_std_suspend = true;
+		break;
+	case PM_POST_HIBERNATION:
+		printk(KERN_INFO"hdmi_pm_notify PM_HIBERNATION_PREPARE\n");
+		g_is_hdmi_std_suspend = false;
+		break;
+	default:
+		break;
+	}
+
+	return NOTIFY_DONE;
+}
+
 /* -----------------------------------------------------------------------------
  * Probe/remove API, used from platforms based on the DRM bridge API.
  */
@@ -3551,6 +3582,13 @@ struct dw_hdmi *dw_hdmi_probe(struct platform_device *pdev,
 
 	drm_bridge_add(&hdmi->bridge);
 
+	if (IS_ENABLED(CONFIG_PM))
+		hdmi->pm_notify.notifier_call = hdmi_light_notify;
+
+	ret = register_pm_notifier(&hdmi->pm_notify);
+	if (ret)
+		printk(KERN_ERR"register_pm_notifier failed: %d\n", ret);
+
 	return hdmi;
 
 err_res:
@@ -3562,6 +3600,8 @@ EXPORT_SYMBOL_GPL(dw_hdmi_probe);
 
 void dw_hdmi_remove(struct dw_hdmi *hdmi)
 {
+	unregister_pm_notifier(&hdmi->pm_notify);
+
 	drm_bridge_remove(&hdmi->bridge);
 
 	if (hdmi->audio && !IS_ERR(hdmi->audio))
