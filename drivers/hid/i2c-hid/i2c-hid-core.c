@@ -262,7 +262,7 @@ static int __i2c_hid_command(struct i2c_client *client,
 	if (wait)
 		set_bit(I2C_HID_RESET_PENDING, &ihid->flags);
 
-	static int retry = 10;
+	int retry = 10;
 	while(retry) {
 		ret = i2c_transfer(client->adapter, msg, msg_num);
 
