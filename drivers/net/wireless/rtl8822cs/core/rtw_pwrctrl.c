@@ -2325,7 +2325,7 @@ void rtw_init_pwrctrl_priv(PADAPTER padapter)
 
 #ifdef CONFIG_RESUME_IN_WORKQUEUE
 	_init_workitem(&pwrctrlpriv->resume_work, resume_workitem_callback, NULL);
-	pwrctrlpriv->rtw_workqueue = create_singlethread_workqueue("rtw_workqueue");
+	pwrctrlpriv->rtw_workqueue = create_freezable_workqueue("rtw_workqueue");
 #endif /* CONFIG_RESUME_IN_WORKQUEUE */
 
 #if defined(CONFIG_HAS_EARLYSUSPEND) || defined(CONFIG_ANDROID_POWER)
@@ -2446,7 +2446,7 @@ void rtw_free_pwrctrl_priv(PADAPTER adapter)
 
 #ifdef CONFIG_RESUME_IN_WORKQUEUE
 	if (pwrctrlpriv->rtw_workqueue) {
-		flush_workqueue(pwrctrlpriv->rtw_workqueue);
+		// flush_workqueue(pwrctrlpriv->rtw_workqueue);
 		destroy_workqueue(pwrctrlpriv->rtw_workqueue);
 	}
 #endif
