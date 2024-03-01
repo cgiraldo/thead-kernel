@@ -2447,7 +2447,7 @@ void rtw_free_pwrctrl_priv(PADAPTER adapter)
 #ifdef CONFIG_RESUME_IN_WORKQUEUE
 	if (pwrctrlpriv->rtw_workqueue) {
 		// flush_workqueue(pwrctrlpriv->rtw_workqueue);
-		destroy_workqueue(pwrctrlpriv->rtw_workqueue);
+		// destroy_workqueue(pwrctrlpriv->rtw_workqueue);
 	}
 #endif
 
