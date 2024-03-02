@@ -15,6 +15,7 @@
 #include <linux/pinctrl/pinctrl.h>
 #include <linux/pinctrl/pinmux.h>
 #include <linux/slab.h>
+#include <linux/kernel.h>
 #include <dt-bindings/pinctrl/light-mpw-pinctrl.h>
 #include <dt-bindings/pinctrl/light-fm-right-pinctrl.h>
 #include <dt-bindings/pinctrl/light-fm-left-pinctrl.h>

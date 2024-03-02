@@ -562,6 +562,11 @@ static enum tcpm_state tcpm_default_state(struct tcpm_port *port)
 	return SRC_UNATTACHED;
 }
 
+int get_tcpm_port_polarity(struct tcpm_port *port)
+{
+	return port->polarity;
+}
+
 static bool tcpm_port_is_disconnected(struct tcpm_port *port)
 {
 	return (!port->attached && port->cc1 == TYPEC_CC_OPEN &&

@@ -329,6 +329,28 @@
 		regulator-always-on;
 	};
 
+	typec0_host: typec0-host {
+		compatible = "regulator-fixed";
+		regulator-name = "typec0-host";
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+		gpio = <&gpio1_porta 6 GPIO_ACTIVE_HIGH>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&typec0_host_en>;
+		enable-active-high;
+    };
+
+    typec1_host: typec1-host {
+		compatible = "regulator-fixed";
+		regulator-name = "typec1-host";
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+		gpio = <&gpio1_porta 4 GPIO_ACTIVE_HIGH>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&typec1_host_en>;
+		enable-active-high;
+    };
+
 	hdmi_en_vcc5v: hdmi-en5v0-en {
 		compatible = "regulator-fixed";
 		regulator-name = "hdmi-en5v-en";
@@ -1144,6 +1166,10 @@
 				>;
 			};
 
+			switch0_gpio: switch0-gpio {
+                thead,pins = < FM_GMAC0_TXD1 LIGHT_PIN_FUNC_3 0x208 >;
+            };
+
 			pinctrl_i2c2: i2c2grp {
 				thead,pins = <
 					FM_I2C2_SCL	0x0	0x204
@@ -1294,8 +1320,20 @@
 				thead,pins = < FM_GPIO1_5 LIGHT_PIN_FUNC_0 0x27f >;
 			};
 
+			switch1_gpio: switch1-gpio {
+                thead,pins = < FM_GPIO1_3 LIGHT_PIN_FUNC_0 0x208 >;
+            };
+
 			hc32fx_int: hc32fx_int {
 				thead,pins = < FM_GPIO1_7 LIGHT_PIN_FUNC_0 0x27f >;
+			};
+
+			red_led: red-led {
+				thead,pins = < FM_GPIO1_14 LIGHT_PIN_FUNC_0 0x208 >;
+			};
+
+			green_led: green-led {
+				thead,pins = < FM_GPIO1_13 LIGHT_PIN_FUNC_0 0x208 >;
 			};
 
 			CHRG_OK: CHRG-OK {
@@ -1387,6 +1425,14 @@
 			ext_vcc5v_en: ext_vcc5v_en{
 				thead,pins = < FM_GPIO1_2 LIGHT_PIN_FUNC_0 0x208 >;
 			};
+
+			typec0_host_en: typec0-host-en{
+                thead,pins = < FM_GPIO1_6 LIGHT_PIN_FUNC_0 0x208 >;
+            };
+
+			typec1_host_en: typec1-host-en{
+                thead,pins = < FM_GPIO1_4 LIGHT_PIN_FUNC_0 0x208 >;
+            };
 		};
 };
 
@@ -1535,8 +1581,10 @@
 		// interrupt-parent = <&gpio3_porta>;
 		// interrupts = <10 0>;
 		int_gpio  = <&gpio3_porta 10 GPIO_ACTIVE_LOW>;
+		switch-gpios = <&gpio3_porta 11 GPIO_ACTIVE_HIGH>;
 		pinctrl-names = "default";
-		pinctrl-0 = <&usbc0_int>;
+		pinctrl-0 = <&usbc0_int &switch0_gpio>;
+        vbus-supply = <&typec0_host>;
 		status = "okay";
 
 		usb_con0: connector {
@@ -1568,10 +1616,12 @@
 			 0x09 0x4A 0x1A 0x47 0x86 0x93 0x97 0x15
 			 0x49 0x71 0x9A 0xC3 0x80 0x41 0x4F 0xCB
 			 0x2F 0x00 0x64 0xA5 0xB5 0x0D 0xB8 0x91>;
-		cellwise,monitor-interval-ms = <5000>;
+		cellwise,monitor-interval-ms = <3000>;
 		cellwise,dual-cell = <1>;
 		monitored-battery = <&battery>;
 		power-supplies = <&bq25703>;
+		red-led-gpios = <&gpio1_porta 14 GPIO_ACTIVE_HIGH>;
+		green-led-gpios = <&gpio1_porta 13 GPIO_ACTIVE_HIGH>;
 	};
 
 	bq25703: bq25703@6b {
@@ -1586,7 +1636,7 @@
 		interrupts = <28 IRQ_TYPE_LEVEL_LOW>;
 
 		pinctrl-names = "default";
-		pinctrl-0 = <&typec0_en &typec1_en &CHRG_OK>;
+		pinctrl-0 = <&typec0_en &typec1_en &red_led &green_led &CHRG_OK>;
 		ti,usb-charger-detection = <&usbc0>;
 		ti,usb-charger-detection1 = <&usbc1>;
 		ti,charge-current = <2500000>;
@@ -1637,8 +1687,10 @@
 		// interrupt-parent = <&gpio1_porta>;
 		// interrupts = <5 IRQ_TYPE_LEVEL_LOW>;
 		int_gpio  = <&gpio1_porta 5 GPIO_ACTIVE_LOW>;
+		switch-gpios = <&gpio1_porta 3 GPIO_ACTIVE_HIGH>;
 		pinctrl-names = "default";
-		pinctrl-0 = <&usbc1_int>;
+		pinctrl-0 = <&usbc1_int &switch1_gpio>;
+        vbus-supply = <&typec1_host>;
 		status = "okay";
 
 		usb_con1: connector {
