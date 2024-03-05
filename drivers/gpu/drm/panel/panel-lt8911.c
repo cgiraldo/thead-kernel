@@ -10,7 +10,7 @@
 #define LT_8911_I2C_ADAPTER	3
 #define LT_8911_I2C_ADDR	0x45
 
-static struct i2c_mipi_dsi *g_lt8911_mipi_dsi = NULL;
+static struct i2c_mipi_dsi g_lt8911_mipi_dsi;
 static bool g_is_std_suspend __nosavedata;
 
 static const struct drm_display_mode lt8911_default_mode = {
@@ -707,7 +707,7 @@ static int backlight_init(struct i2c_mipi_dsi *md)
 static int i2c_md_probe(struct i2c_client *client, const struct i2c_device_id *id)
 {
 	struct device *dev = &client->dev;
-	struct i2c_mipi_dsi *md = g_lt8911_mipi_dsi;
+	struct i2c_mipi_dsi *md = &g_lt8911_mipi_dsi;
 
 	DBG_FUNC("start");
 
@@ -872,13 +872,10 @@ static int lt8911_dsi_probe(struct mipi_dsi_device *dsi)
 	int ret;
 	struct i2c_mipi_dsi *ctx;
 
-	ctx = g_lt8911_mipi_dsi;
+	ctx = &g_lt8911_mipi_dsi;
 
 	if(ctx == NULL){
-		ctx = devm_kzalloc(&dsi->dev, sizeof(*ctx), GFP_KERNEL);
-		if (!ctx)
-			return -ENOMEM;
-		g_lt8911_mipi_dsi = ctx;
+		return -ENOMEM;
 	}
 
 	if(ctx->client == NULL){

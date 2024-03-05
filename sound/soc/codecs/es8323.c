@@ -685,11 +685,11 @@ static int es8323_set_dai_fmt(struct snd_soc_dai *codec_dai, unsigned int fmt)
 	u8 iface = 0;
 	u8 adciface = 0;
 	u8 daciface = 0;
-
+	printk(KERN_EMERG "yd %s %d\n", __func__, __LINE__);
 	iface = snd_soc_component_read(component, ES8323_IFACE);
 	adciface = snd_soc_component_read(component, ES8323_ADC_IFACE);
 	daciface = snd_soc_component_read(component, ES8323_DAC_IFACE);
-
+	printk(KERN_EMERG "yd %s %d\n", __func__, __LINE__);
 	/* set master/slave audio interface */
 	switch (fmt & SND_SOC_DAIFMT_MASTER_MASK) {
 	case SND_SOC_DAIFMT_CBM_CFM:	/* MASTER MODE */
@@ -749,7 +749,7 @@ static int es8323_set_dai_fmt(struct snd_soc_dai *codec_dai, unsigned int fmt)
 	snd_soc_component_write(component, ES8323_IFACE, iface);
 	snd_soc_component_write(component, ES8323_ADC_IFACE, adciface);
 	snd_soc_component_write(component, ES8323_DAC_IFACE, daciface);
-
+	printk(KERN_EMERG "yd %s %d\n", __func__, __LINE__);
 	return 0;
 }
 
@@ -824,9 +824,11 @@ static int es8323_pcm_hw_params(struct snd_pcm_substream *substream,
 {
 	struct snd_soc_component *component = dai->component;
 	struct es8323_priv *es8323 = snd_soc_component_get_drvdata(component);
+
 	u16 srate = snd_soc_component_read(component, ES8323_IFACE) & 0x80;
 	u16 adciface = snd_soc_component_read(component, ES8323_ADC_IFACE) & 0xE3;
 	u16 daciface = snd_soc_component_read(component, ES8323_DAC_IFACE) & 0xC7;
+
 	int coeff;
 	int i;
 
@@ -1035,6 +1037,7 @@ static int es8323_probe(struct snd_soc_component *component)
 	es8323->component = component;
 
 	ret = es8323_reset(component);
+
 	if (ret < 0) {
 		dev_err(component->dev, "Failed to issue reset\n");
 		// clk_disable_unprepare(es8323->mclk);
@@ -1081,7 +1084,6 @@ static int es8323_probe(struct snd_soc_component *component)
 	snd_soc_component_write(component, 0x14, 0x05);
 	snd_soc_component_write(component, 0x15, 0x06);
 	snd_soc_component_write(component, 0x16, 0x53);
-
 	snd_soc_component_write(component, 0x17, 0x18);
 	snd_soc_component_write(component, 0x18, 0x02);
 	snd_soc_component_write(component, 0x1A, 0x00);
@@ -1098,7 +1100,6 @@ static int es8323_probe(struct snd_soc_component *component)
 	snd_soc_component_write(component, 0x02, 0x00);
 	usleep_range(18000, 20000);
 	snd_soc_component_write(component, 0x04, 0x3C);
-
 	es8323_set_bias_level(component, SND_SOC_BIAS_STANDBY);
         g_es8323 = es8323;
         DBG("%s : successfully !\n",__func__);
@@ -1133,7 +1134,7 @@ static const struct snd_soc_component_driver soc_codec_dev_es8323 = {
 static const struct regmap_config es8323_regmap_config = {
 	.reg_bits	= 8,
 	.val_bits	= 8,
-	.max_register	= ES8323_DACCONTROL30,
+	.max_register	= ES8323_DACCONTROL31,
 	.cache_type	= REGCACHE_RBTREE,
 	.reg_defaults	= es8323_reg_defaults,
 	.num_reg_defaults = ARRAY_SIZE(es8323_reg_defaults),

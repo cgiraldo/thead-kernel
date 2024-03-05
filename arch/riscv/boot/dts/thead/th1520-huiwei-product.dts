@@ -19,17 +19,7 @@
                         sound-dai = <&es8388_audio_codec>;
                 };
         };
-        simple-audio-card,dai-link@1 {          /* I2S - AUDIO SYS CODEC 7210*/
-                reg = <1>;
-                format = "i2s";
-                cpu {
-                        sound-dai = <&i2s1 0>;
-                };
-                codec {
-                        sound-dai = <&es7210_audio_codec>;
-                };
-        };
-        simple-audio-card,dai-link@2 { /* I2S - AUDIO SYS CODEC HDMI*/
+        simple-audio-card,dai-link@1 { /* I2S - AUDIO SYS CODEC HDMI*/
                 reg = <2>;
                 format = "i2s";
                 cpu {

@@ -287,25 +287,6 @@
 		status = "okay";
 	};
 
-	reg_tp_pwr_en: regulator-pwr-en {
-		compatible = "regulator-fixed";
-		regulator-name = "regulator-pwr-en";
-		regulator-min-microvolt = <2800000>;
-		regulator-max-microvolt = <2800000>;
-		gpio = <&pcal6408ahk_d 4 1>;
-		enable-active-high;
-		regulator-always-on;
-	};
-
-	reg_usb_hub_vdd1v2: regulator-hub-vdd12-en {
-		compatible = "regulator-fixed";
-		regulator-name = "regulator-hub-vdd12-en";
-		regulator-min-microvolt = <1200000>;
-		regulator-max-microvolt = <1200000>;
-		gpio = <&pcal6408ahk_d 2 1>;
-		enable-active-high;
-	};
-
 	reg_usb_hub_vcc5v: regulator-hub-vcc5v-en {
 		compatible = "regulator-fixed";
 		regulator-name = "regulator-hub-vcc5v-en";
@@ -472,24 +453,6 @@
 			regulator-always-on;
 		};
 
-		soc_vdd33_lcd0_en_reg: soc_lcd0_vdd33_en {
-			compatible = "regulator-fixed";
-			regulator-name = "soc_lcd0_vdd33_en";
-			regulator-min-microvolt = <3300000>;
-			regulator-max-microvolt = <3300000>;
-			gpio = <&pcal6408ahk_d 5 1>;
-			enable-active-high;
-		};
-
-		soc_vdd18_lcd0_en_reg: soc_lcd0_vdd18_en {
-			compatible = "regulator-fixed";
-			regulator-name = "soc_lcd0_vdd18_en";
-			regulator-min-microvolt = <1800000>;
-			regulator-max-microvolt = <1800000>;
-			gpio = <&pcal6408ahk_d 6 1>;
-			enable-active-high;
-		};
-
 		soc_vdd5v_se_en_reg: soc_vdd5v_se_en {
 			compatible = "regulator-fixed";
 			regulator-name = "soc_vdd5v_se_en";
@@ -518,88 +481,6 @@
 			gpio = <&gpio0_porta 27 GPIO_ACTIVE_HIGH>;
 			enable-active-high;
 		
-		};
-
-
-		soc_avdd28_rgb_reg: soc_avdd28_rgb {
-			compatible = "regulator-fixed";
-			regulator-name = "soc_avdd28_rgb";
-			regulator-min-microvolt = <2800000>;
-			regulator-max-microvolt = <2800000>;
-			gpio = <&pcal6408ahk_b 1 1>;
-			enable-active-high;
-		};
-
-		soc_dovdd18_rgb_reg: soc_dovdd18_rgb {
-			compatible = "regulator-fixed";
-			regulator-name = "soc_dovdd18_rgb";
-			regulator-min-microvolt = <2800000>;
-			regulator-max-microvolt = <2800000>;
-			gpio = <&pcal6408ahk_b 2 1>;
-			enable-active-high;
-		};
-
-		soc_dvdd12_rgb_reg: soc_dvdd12_rgb {
-			compatible = "regulator-fixed";
-			regulator-name = "soc_dvdd12_rgb";
-			regulator-min-microvolt = <2800000>;
-			regulator-max-microvolt = <2800000>;
-			gpio = <&pcal6408ahk_b 0 1>;
-			enable-active-high;
-		};
-
-		soc_avdd25_ir_reg: soc_avdd25_ir {
-			compatible = "regulator-fixed";
-			regulator-name = "soc_avdd25_ir";
-			regulator-min-microvolt = <2500000>;
-			regulator-max-microvolt = <2500000>;
-			gpio = <&pcal6408ahk_b 5 1>;
-			enable-active-high;
-		};
-
-		soc_dovdd18_ir_reg: soc_dovdd18_ir {
-			compatible = "regulator-fixed";
-			regulator-name = "soc_dovdd18_ir";
-			regulator-min-microvolt = <1800000>;
-			regulator-max-microvolt = <1800000>;
-			gpio = <&pcal6408ahk_b 3 1>;
-			enable-active-high;
-		};
-
-		soc_dvdd12_ir_reg: soc_dvdd12_ir {
-			compatible = "regulator-fixed";
-			regulator-name = "soc_dvdd12_ir";
-			regulator-min-microvolt = <1200000>;
-			regulator-max-microvolt = <1200000>;
-			gpio = <&pcal6408ahk_b 4 1>;
-			enable-active-high;
-		};
-
-		soc_cam2_avdd25_ir_reg: soc_cam2_avdd25_ir {
-			compatible = "regulator-fixed";
-			regulator-name = "soc_cam2_avdd25_ir";
-			regulator-min-microvolt = <2500000>;
-			regulator-max-microvolt = <2500000>;
-			gpio = <&pcal6408ahk_b 7 1>;
-			enable-active-high;
-		};
-
-		soc_cam2_dovdd18_ir_reg: soc_cam2_dovdd18_ir {
-			compatible = "regulator-fixed";
-			regulator-name = "soc_cam2_dovdd18_ir";
-			regulator-min-microvolt = <1800000>;
-			regulator-max-microvolt = <1800000>;
-			gpio = <&pcal6408ahk_b 6 1>;
-			enable-active-high;
-		};
-
-		soc_cam2_dvdd12_ir_reg: soc_cam2_dvdd12_ir {
-			compatible = "regulator-fixed";
-			regulator-name = "soc_cam2_dvdd12_ir";
-			regulator-min-microvolt = <1200000>;
-			regulator-max-microvolt = <1200000>;
-			gpio = <&pcal6408ahk_c 0 1>;
-			enable-active-high;
 		};
 
 			dvdd_cpu_reg: appcpu_dvdd {
@@ -897,7 +778,7 @@
 
 	es8388_audio_codec: es8388@11 {
 		#sound-dai-cells = <0>;
-		compatible = "everest,es8388", "everest,es8323";
+		compatible = "everest,es8323";
 		reg = <0x11>;
 		sound-name-prefix = "ES8388";
 		headset-detect = <&rk_headset>;
@@ -908,17 +789,6 @@
 		hp-ctl-gpios = <&ao_gpio4_porta 2 GPIO_ACTIVE_HIGH>;
 		pinctrl-names = "default";
 		pinctrl-0 = <&pinctrl_audiopa3 &pinctrl_audiopa2>;
-	};
-
-	es7210_audio_codec: es7210@40 {
-		#sound-dai-cells = <0>;
-		compatible = "MicArray_0";
-		reg = <0x40>;
-		sound-name-prefix = "ES7210";
-		MVDD-supply = <&soc_aud_3v3_en_reg>;
-		AVDD-supply = <&soc_aud_3v3_en_reg>;
-		DVDD-supply = <&soc_aud_1v8_en_reg>;
-		PVDD-supply = <&soc_aud_1v8_en_reg>;
 	};
 
 	audio_aw87519_pa: amp@58 {
@@ -947,13 +817,6 @@
 		#sound-dai-cells = <0>;
 		compatible = "everest,es8156";
 		reg = <0x08>;
-		status = "disabled";
-	};
-
-	es7210_audio_codec_1: es7210@40 {
-		#sound-dai-cells = <0>;
-		compatible = "MicArray_0";
-		reg = <0x40>;
 		status = "disabled";
 	};
 
@@ -1058,24 +921,6 @@
 			reg = <0x00000000 0x08000000>;
 		};
 	};
-};
-
-&qspi1 {
-	compatible = "snps,dw-apb-ssi";
-	num-cs = <1>;
-	cs-gpios = <&gpio0_porta 1 0>;
-	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_qspi1>;
-	status = "okay";
-
-	spidev@0 {
-		compatible = "spidev";
-		#address-cells = <0x1>;
-		#size-cells = <0x1>;
-		reg = <0x0>;
-		spi-max-frequency = <50000000>;
-	};
-
 };
 
 &gmac0 {
@@ -1568,13 +1413,6 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_i2c0>;
 
-	pcal6408ahk_b: gpio@18 {
-		compatible = "nxp,pca9557";
-		reg = <0x18>;
-		gpio-controller;
-		#gpio-cells = <2>;
-	};
-
 	usbc0: husb311_0@4e {
 		compatible = "hynetek,husb311";
 		reg = <0x4e>;
@@ -1664,13 +1502,6 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_i2c1>;
 
-	pcal6408ahk_c: gpio@18 {
-		compatible = "nxp,pca9557";
-		reg = <0x18>;
-		gpio-controller;
-		#gpio-cells = <2>;
-	};
-
 	hc32fx_mcu:hc32fx_mcu@0x4c {
 		compatible = "hc32fx-mcu";
 		reg = <0x4c>;
@@ -1735,13 +1566,6 @@
 	status = "disabled";
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_i2c3>;
-
-	pcal6408ahk_d: gpio@18 {
-		compatible = "nxp,pca9557";
-		reg = <0x18>;
-		gpio-controller;
-		#gpio-cells = <2>;
-	};
 
 	touch@14 {
 		#gpio-cells = <2>;
@@ -1837,74 +1661,6 @@
 &xtensa_dsp1 {
 	status = "okay";
     memory-region = <&dsp1_mem>;
-};
-
-&vvcam_sensor0 {
-	sensor_name = "OV12870";
-	sensor_regulators = "soc_dovdd18_rgb", "soc_dvdd12_rgb", "soc_avdd28_rgb";
-	sensor_regulator_timing_us = <70 50 20>;
-	sensor_pdn = <&gpio1_porta 28 0>; //powerdown pin / shutdown pin 
-    sensor_rst 	= <&pcal6408ahk_c 1 0>;
-	sensor_pdn_delay_us = <4000>; //powerdown pin / shutdown pin actived till I2C ready
-	DOVDD18_RGB-supply = <&soc_dovdd18_rgb_reg>;
-	DVDD12_RGB-supply = <&soc_dvdd12_rgb_reg>;
-	AVDD28_RGB-supply = <&soc_avdd28_rgb_reg>;
-    i2c_reg_width = /bits/ 8 <2>;
-    i2c_data_width = /bits/ 8 <1>;
-    i2c_addr = /bits/ 8 <0x10>;
-	i2c_bus = /bits/ 8 <0>;
-	status = "okay";
-};
-
-&vvcam_sensor1 {//cam1 csia
-    sensor_name = "SC132GS";
-    sensor_regulators = "soc_dovdd18_ir", "soc_dvdd12_ir", "soc_avdd25_ir";
-    sensor_regulator_timing_us = <70 1000 2000>;
-    i2c_addr = /bits/ 8 <0x30>;
-    sensor_pdn = <&gpio1_porta 30 0>; //powerdown pin / shutdown pin 
-    sensor_rst 	= <&pcal6408ahk_c 2 0>;
-	sensor_pdn_delay_us = <2000>; //powerdown pin / shutdown pin actived till I2C ready
-    DOVDD18_IR-supply = <&soc_dovdd18_ir_reg>;
-    DVDD12_IR-supply = <&soc_dvdd12_ir_reg>;
-    AVDD25_IR-supply = <&soc_avdd25_ir_reg>;
-    i2c_reg_width = /bits/ 8 <2>;
-    i2c_data_width = /bits/ 8 <1>;
-    i2c_bus = /bits/ 8 <1>;
-    status = "okay";
-};
-
-&vvcam_sensor2 {//cam2 csib
-    sensor_name = "SC132GS";
-    sensor_regulators = "soc_cam2_dovdd18_ir", "soc_cam2_dvdd12_ir", "soc_cam2_avdd25_ir";
-    sensor_regulator_timing_us = <70 1000 2000>;
-    i2c_addr = /bits/ 8 <0x30>;
-    sensor_pdn = <&gpio2_porta 13 0>; //powerdown pin / shutdown pin 
-    sensor_rst 	= <&pcal6408ahk_c 3 0>;
-	sensor_pdn_delay_us = <2000>; //powerdown pin / shutdown pin actived till I2C ready
-    DOVDD18_IR-supply = <&soc_cam2_dovdd18_ir_reg>;
-    DVDD12_IR-supply = <&soc_cam2_dvdd12_ir_reg>;
-    AVDD25_IR-supply = <&soc_cam2_avdd25_ir_reg>;
-    i2c_reg_width = /bits/ 8 <2>;
-    i2c_data_width = /bits/ 8 <1>;
-    i2c_bus = /bits/ 8 <2>;
-    status = "okay";
-};
-
-&vvcam_sensor3 {//cam3 csi0 modified
-	sensor_name = "OV5693";
-	sensor_regulators = "soc_dovdd18_rgb", "soc_dvdd12_rgb", "soc_avdd28_rgb";
-	sensor_regulator_timing_us = <70 50 20>;
-	sensor_pdn = <&gpio1_porta 28 0>; //powerdown pin / shutdown pin 
-	sensor_rst 	= <&pcal6408ahk_c 1 0>;
-	sensor_pdn_delay_us = <4000>; //powerdown pin / shutdown pin actived till I2C ready
-	DOVDD18_RGB-supply = <&soc_dovdd18_rgb_reg>;
-	DVDD12_RGB-supply = <&soc_dvdd12_rgb_reg>;
-	AVDD28_RGB-supply = <&soc_avdd28_rgb_reg>;
-	i2c_reg_width = /bits/ 8 <2>;
-	i2c_data_width = /bits/ 8 <1>;
-	i2c_addr = /bits/ 8 <0x36>;
-	i2c_bus = /bits/ 8 <0>;
-	status = "okay";
 };
 
 &video2 {
@@ -2220,17 +1976,7 @@
                         sound-dai = <&es8388_audio_codec>;
                 };
         };
-        simple-audio-card,dai-link@1 {          /* I2S - AUDIO SYS CODEC 7210*/
-                reg = <1>;
-                format = "i2s";
-                cpu {
-                        sound-dai = <&i2s1 0>;
-                };
-                codec {
-                        sound-dai = <&es7210_audio_codec>;
-                };
-        };
-        simple-audio-card,dai-link@2 {          /* I2S - HDMI*/
+        simple-audio-card,dai-link@1 {          /* I2S - HDMI*/
                 reg = <2>;
                 format = "i2s";
                 cpu {
