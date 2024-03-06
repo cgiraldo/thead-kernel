@@ -28,7 +28,7 @@
 #include <video/mipi_display.h>
 
 
-#if 1
+#if 0
 #define DBG_FUNC(format, x...)		printk(KERN_ERR "[DSI]%s:" format"\n", __func__, ##x)
 #define DBG_PRINT(format, x...)		printk(KERN_ERR "[DSI]" format"\n", ##x)
 #else
