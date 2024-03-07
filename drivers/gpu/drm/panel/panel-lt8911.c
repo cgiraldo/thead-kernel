@@ -855,9 +855,35 @@ static const struct of_device_id i2c_md_of_ids[] = {
 };
 MODULE_DEVICE_TABLE(of, i2c_md_of_ids);
 
+#ifdef CONFIG_PM_SLEEP
+
+static int edpi2c_suspend(struct device *dev)
+{
+	return 0;
+}
+
+static int edpi2c_resume(struct device *dev)
+{
+	return 0;
+}
+
+static const struct dev_pm_ops edpi2c_pm_ops = {
+    SET_LATE_SYSTEM_SLEEP_PM_OPS(edpi2c_suspend,
+				 edpi2c_resume)
+};
+
+#define EDPI2C_PM_OPS &edpi2c_pm_ops
+
+#else
+
+#define EDPI2C_PM_OPS NULL
+
+#endif
+
 static struct i2c_driver i2c_md_driver = {
 	.driver = {
 		.name = "i2c_mipi_dsi",
+		.pm = EDPI2C_PM_OPS,
 		.of_match_table = i2c_md_of_ids,
 	},
 	.probe = i2c_md_probe,
