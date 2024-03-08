@@ -2162,7 +2162,7 @@
 			clocks = <&clk CLKGEN_I2C1_PCLK>;
 			clock-names = "pclk";
 			clock-frequency = <100000>;
-            // i2c_mode = "dma";
+            i2c_mode = "dma";
 			dmas = <&dmac0 14>, <&dmac0 15>;
 			dma-names = "tx", "rx";
 			#dma-cells = <1>;
@@ -2238,7 +2238,7 @@
 			clocks = <&clk CLKGEN_I2C4_PCLK>;
 			clock-names = "pclk";
 			clock-frequency = <100000>;
-            // i2c_mode = "dma";
+            i2c_mode = "dma";
 			dmas = <&dmac0 20>, <&dmac0 21>;
 			dma-names = "tx", "rx";
 			#dma-cells = <1>;

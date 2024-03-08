@@ -685,11 +685,11 @@ static int es8323_set_dai_fmt(struct snd_soc_dai *codec_dai, unsigned int fmt)
 	u8 iface = 0;
 	u8 adciface = 0;
 	u8 daciface = 0;
-	printk(KERN_EMERG "yd %s %d\n", __func__, __LINE__);
+
 	iface = snd_soc_component_read(component, ES8323_IFACE);
 	adciface = snd_soc_component_read(component, ES8323_ADC_IFACE);
 	daciface = snd_soc_component_read(component, ES8323_DAC_IFACE);
-	printk(KERN_EMERG "yd %s %d\n", __func__, __LINE__);
+
 	/* set master/slave audio interface */
 	switch (fmt & SND_SOC_DAIFMT_MASTER_MASK) {
 	case SND_SOC_DAIFMT_CBM_CFM:	/* MASTER MODE */
@@ -749,7 +749,7 @@ static int es8323_set_dai_fmt(struct snd_soc_dai *codec_dai, unsigned int fmt)
 	snd_soc_component_write(component, ES8323_IFACE, iface);
 	snd_soc_component_write(component, ES8323_ADC_IFACE, adciface);
 	snd_soc_component_write(component, ES8323_DAC_IFACE, daciface);
-	printk(KERN_EMERG "yd %s %d\n", __func__, __LINE__);
+
 	return 0;
 }
 
