@@ -775,6 +775,7 @@ static int dwapb_gpio_suspend(struct device *dev)
 static int dwapb_gpio_resume(struct device *dev)
 {
 	struct dwapb_gpio *gpio = dev_get_drvdata(dev);
+	struct dwapb_context *ctx = gpio->ports[0].ctx;
 	struct gpio_chip *gc	= &gpio->ports[0].gc;
 	unsigned long flags;
 	int i, err;
@@ -788,6 +789,7 @@ static int dwapb_gpio_resume(struct device *dev)
 	spin_lock_irqsave(&gc->bgpio_lock, flags);
 	for (i = 0; i < gpio->nr_ports; i++) {
 		unsigned int offset;
+		unsigned int int_pol,preserve_bit,resume_bit;
 		unsigned int idx = gpio->ports[i].idx;
 		struct dwapb_context *ctx = gpio->ports[i].ctx;
 
@@ -803,7 +805,11 @@ static int dwapb_gpio_resume(struct device *dev)
 		/* Only port A can provide interrupts */
 		if (idx == 0) {
 			dwapb_write(gpio, GPIO_INTTYPE_LEVEL, ctx->int_type);
-			dwapb_write(gpio, GPIO_INT_POLARITY, ctx->int_pol);
+			int_pol = dwapb_read(gpio, GPIO_INT_POLARITY);
+			preserve_bit = int_pol & ctx->wake_en;
+			resume_bit = ctx->int_pol & (~ctx->wake_en);
+			int_pol = preserve_bit | resume_bit;
+			dwapb_write(gpio, GPIO_INT_POLARITY, int_pol);
 			dwapb_write(gpio, GPIO_PORTA_DEBOUNCE, ctx->int_deb);
 			dwapb_write(gpio, GPIO_INTEN, ctx->int_en);
 			dwapb_write(gpio, GPIO_INTMASK, ctx->int_mask);
