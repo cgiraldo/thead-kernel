@@ -14,7 +14,7 @@
  *****************************************************************************/
 #include <drv_types.h>
 #include <hal_data.h>
-#include "crypto/aes.h"
+#include <crypto/aes.h>
 #include "crypto/aes_siv.h"
 #include "crypto/aes_wrap.h"
 #include "crypto/sha256.h"

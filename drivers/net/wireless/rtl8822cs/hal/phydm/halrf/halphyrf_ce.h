@@ -26,7 +26,7 @@
 #ifndef __HALPHYRF_H__
 #define __HALPHYRF_H__
 
-#include "../halrf/halrf_kfree.h"
+#include "halrf_kfree.h"
 #if (RTL8814A_SUPPORT == 1)
 #include "halrf/rtl8814a/halrf_iqk_8814a.h"
 #endif
@@ -52,7 +52,7 @@
 	#include "halrf/rtl8814b/halrf_txgapk_8814b.h"
 #endif
 
-#include "../halrf/halrf_powertracking_ce.h"
+#include "halrf_powertracking_ce.h"
 
 enum spur_cal_method {
 	PLL_RESET,
@@ -83,6 +83,7 @@ struct txpwrtrack_cfg {
 	u8 swing_table_size_ofdm;
 	u8 threshold_iqk;
 	u8 threshold_dpk;
+	u8 threshold_lck;
 	u8 average_thermal_num;
 	u8 rf_path_count;
 	u32 thermal_reg_addr;
@@ -108,7 +109,7 @@ void odm_txpowertracking_callback_thermal_meter(void *dm);
 void odm_txpowertracking_callback_thermal_meter(void *adapter);
 #endif
 
-#if (RTL8822C_SUPPORT == 1 || RTL8814B_SUPPORT == 1)
+#if (RTL8822C_SUPPORT == 1 || RTL8814B_SUPPORT == 1 || RTL8822E_SUPPORT == 1)
 void odm_txpowertracking_new_callback_thermal_meter(void *dm_void);
 #endif
 
