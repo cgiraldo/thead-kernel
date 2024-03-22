@@ -203,11 +203,21 @@ static void _run_thread(PADAPTER adapter)
 
 	if (xmitpriv->SdioXmitThread == NULL) {
 		RTW_INFO(FUNC_ADPT_FMT " start RTWHALXT\n", FUNC_ADPT_ARG(adapter));
+#ifdef CONFIG_CPU_BALANCE_HALXT_THREAD
+		xmitpriv->SdioXmitThread = kthread_create(rtl8822cs_xmit_thread, adapter, "RTWHALXT");
+#else
 		xmitpriv->SdioXmitThread = kthread_run(rtl8822cs_xmit_thread, adapter, "RTWHALXT");
+#endif
 		if (IS_ERR(xmitpriv->SdioXmitThread)) {
 			RTW_ERR("%s: start rtl8822cs_xmit_thread FAIL!!\n", __FUNCTION__);
 			xmitpriv->SdioXmitThread = NULL;
 		}
+#ifdef CONFIG_CPU_BALANCE_HALXT_THREAD
+		else {
+			kthread_bind(xmitpriv->SdioXmitThread, CPUID_HALXT);
+			wake_up_process(xmitpriv->SdioXmitThread);
+		}
+#endif
 	}
 #endif /* !CONFIG_SDIO_TX_TASKLET */
 }

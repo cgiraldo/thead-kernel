@@ -2320,11 +2320,21 @@ u32 rtw_start_drv_threads(_adapter *padapter)
 	{
 		if (padapter->xmitThread == NULL) {
 			RTW_INFO(FUNC_ADPT_FMT " start RTW_XMIT_THREAD\n", FUNC_ADPT_ARG(padapter));
+#ifdef CONFIG_CPU_BALANCE_TX_THREAD
+			padapter->xmitThread = kthread_create(rtw_xmit_thread, padapter, "RTW_XMIT_THREAD");
+#else
 			padapter->xmitThread = kthread_run(rtw_xmit_thread, padapter, "RTW_XMIT_THREAD");
+#endif
 			if (IS_ERR(padapter->xmitThread)) {
 				padapter->xmitThread = NULL;
 				_status = _FAIL;
 			}
+#ifdef CONFIG_CPU_BALANCE_TX_THREAD
+			else {
+				kthread_bind(padapter->xmitThread, CPUID_XMIT);
+				wake_up_process(padapter->xmitThread);
+			}
+#endif
 		}
 	}
 #endif /* #ifdef CONFIG_XMIT_THREAD_MODE */
@@ -2333,11 +2343,21 @@ u32 rtw_start_drv_threads(_adapter *padapter)
 	if (is_primary_adapter(padapter)) {
 		if (padapter->recvThread == NULL) {
 			RTW_INFO(FUNC_ADPT_FMT " start RTW_RECV_THREAD\n", FUNC_ADPT_ARG(padapter));
+#ifdef CONFIG_CPU_BALANCE_RX_THREAD
+			padapter->recvThread = kthread_create(rtw_recv_thread, padapter, "RTW_RECV_THREAD");
+#else
 			padapter->recvThread = kthread_run(rtw_recv_thread, padapter, "RTW_RECV_THREAD");
+#endif
 			if (IS_ERR(padapter->recvThread)) {
 				padapter->recvThread = NULL;
 				_status = _FAIL;
 			}
+#ifdef CONFIG_CPU_BALANCE_RX_THREAD
+			else {
+				kthread_bind(padapter->recvThread, CPUID_RECV);
+				wake_up_process(padapter->recvThread);
+			}
+#endif
 		}
 	}
 #endif
