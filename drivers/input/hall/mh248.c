@@ -148,11 +148,31 @@ static int hall_mh248_probe(struct platform_device *pdev)
 	enable_irq_wake(mh248->irq);
 	mh248->fb_notif.notifier_call = hall_fb_notifier_callback;
 	fb_register_client(&mh248->fb_notif);
+	platform_set_drvdata(pdev, mh248);
 	dev_info(mh248->dev, "hall_mh248_probe success.\n");
 
 	return 0;
 }
+#ifdef CONFIG_PM_SLEEP
+static int hall_mh248_resume(struct device *dev)
+{
+	struct mh248_para *mh248 = dev_get_drvdata(dev);
+	int gpio_value = 0;
 
+	gpio_value = gpio_get_value(mh248->gpio_pin);
+
+	if ((gpio_value == mh248->active_value) ) {
+		input_report_switch(mh248->hall_input, SW_LID, 0);
+		input_sync(mh248->hall_input);
+	}
+	return 0;
+}
+
+static const struct dev_pm_ops hall_mh248_pm_ops = {
+	SET_SYSTEM_SLEEP_PM_OPS(NULL, hall_mh248_resume)
+
+};
+#endif
 static const struct of_device_id hall_mh248_match[] = {
 	{ .compatible = "hall-mh248" },
 	{ /* Sentinel */ }
@@ -164,6 +184,7 @@ static struct platform_driver hall_mh248_driver = {
 		.name = "mh248",
 		.owner = THIS_MODULE,
 		.of_match_table	= hall_mh248_match,
+		.pm = &hall_mh248_pm_ops,
 	},
 };
 
