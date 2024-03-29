@@ -42,7 +42,6 @@ static int nohibernate;
 static int resume_wait;
 static unsigned int resume_delay;
 static char resume_file[256] = CONFIG_PM_STD_PARTITION;
-static int resume_keep_sign;
 dev_t swsusp_resume_device;
 sector_t swsusp_resume_block;
 __visible int in_suspend __nosavedata;
@@ -844,7 +843,7 @@ int hibernate(void)
 	unlock_device_hotplug();
 	if (snapshot_test) {
 		pm_pr_dbg("Checking hibernation image\n");
-		error = swsusp_check(0);
+		error = swsusp_check();
 		if (!error)
 			error = load_image_and_restore();
 	}
@@ -1041,7 +1040,7 @@ static int software_resume(void)
 		MAJOR(swsusp_resume_device), MINOR(swsusp_resume_device));
 
 	pm_pr_dbg("Looking for hibernation image.\n");
-	error = swsusp_check(resume_keep_sign);
+	error = swsusp_check();
 	if (error)
 		goto Unlock;
 
@@ -1450,11 +1449,6 @@ static int __init nohibernate_setup(char *str)
 	return 1;
 }
 
-static int __init resume_keepsign_setup(char *str)
-{
-	resume_keep_sign = 1;
-	return 1;
-}
 
 __setup("noresume", noresume_setup);
 __setup("resume_offset=", resume_offset_setup);
@@ -1463,4 +1457,3 @@ __setup("hibernate=", hibernate_setup);
 __setup("resumewait", resumewait_setup);
 __setup("resumedelay=", resumedelay_setup);
 __setup("nohibernate", nohibernate_setup);
-__setup("resume_keepsign", resume_keepsign_setup);
