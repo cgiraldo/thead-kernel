@@ -66,6 +66,10 @@ static bool debug;
 module_param(debug, bool, 0444);
 MODULE_PARM_DESC(debug, "print a lot of debug information");
 
+#ifdef CONFIG_HS_MH248
+	extern bool get_hall_status(void);
+#endif
+
 #define i2c_hid_dbg(ihid, fmt, arg...)					  \
 do {									  \
 	if (debug)							  \
@@ -1235,6 +1239,7 @@ static int i2c_hid_suspend(struct device *dev)
 	struct i2c_client *client = to_i2c_client(dev);
 	struct i2c_hid *ihid = i2c_get_clientdata(client);
 	struct hid_device *hid = ihid->hid;
+	bool hall_open = true;
 	int ret;
 	int wake_status;
 
@@ -1247,8 +1252,6 @@ static int i2c_hid_suspend(struct device *dev)
 	/* Save some power */
 	i2c_hid_set_power(client, I2C_HID_PWR_SLEEP);
 
-	// disable_irq(client->irq);
-
 	if (device_may_wakeup(&client->dev)) {
 		wake_status = enable_irq_wake(client->irq);
 		if (!wake_status)
@@ -1258,9 +1261,16 @@ static int i2c_hid_suspend(struct device *dev)
 				wake_status);
 	} else {
 		regulator_bulk_disable(ARRAY_SIZE(ihid->pdata.supplies),
-				       ihid->pdata.supplies);
+					ihid->pdata.supplies);
 	}
 
+#ifdef CONFIG_HS_MH248
+	hall_open = get_hall_status();
+#endif
+
+	if(!hall_open) {
+		disable_irq(client->irq);
+	}
 	return 0;
 }
 
@@ -1289,7 +1299,7 @@ static int i2c_hid_resume(struct device *dev)
 				wake_status);
 	}
 
-	// enable_irq(client->irq);
+	enable_irq(client->irq);
 
 	/* Instead of resetting device, simply powers the device on. This
 	 * solves "incomplete reports" on Raydium devices 2386:3118 and

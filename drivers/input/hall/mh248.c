@@ -31,11 +31,23 @@ struct mh248_para {
 	struct notifier_block fb_notif;
 	struct mutex ops_lock;
 	struct input_dev *hall_input;
+	bool is_open;
 	int is_suspend;
 	int gpio_pin;
 	int irq;
 	int active_value;
 };
+struct mh248_para *g_mh248;
+
+bool get_hall_status(void)
+{
+	if(g_mh248) {
+		return g_mh248->is_open;
+	} else {
+		return true;
+	}
+};
+EXPORT_SYMBOL(get_hall_status);
 
 static int hall_fb_notifier_callback(struct notifier_block *self,
 				     unsigned long action, void *data)
@@ -72,12 +84,14 @@ static irqreturn_t hall_mh248_interrupt(int irq, void *dev_id)
 		//input_report_key(mh248->hall_input, KEY_SLEEP, 1);
 		//input_sync(mh248->hall_input);
 		//input_report_key(mh248->hall_input, KEY_SLEEP, 0);
+		mh248->is_open = false;
 		input_report_switch(mh248->hall_input, SW_LID, 1);
 		input_sync(mh248->hall_input);
 	} else if ((gpio_value == mh248->active_value) ) {
 		//input_report_key(mh248->hall_input, KEY_WAKEUP, 1);
 		//input_sync(mh248->hall_input);
 		//input_report_key(mh248->hall_input, KEY_WAKEUP, 0);
+		mh248->is_open = true;
 		input_report_switch(mh248->hall_input, SW_LID, 0);
 		input_sync(mh248->hall_input);
 	}
@@ -97,8 +111,9 @@ static int hall_mh248_probe(struct platform_device *pdev)
 	if (!mh248)
 		return -ENOMEM;
 
+	g_mh248 = mh248;
 	mh248->dev = &pdev->dev;
-
+	mh248->is_open = true;
 	mh248->gpio_pin = of_get_named_gpio_flags(np, "irq-gpio",
 						  0, &irq_flags);
 	if (!gpio_is_valid(mh248->gpio_pin)) {
