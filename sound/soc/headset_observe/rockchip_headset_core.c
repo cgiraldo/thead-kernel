@@ -215,6 +215,7 @@ static int rockchip_headset_suspend(struct platform_device *pdev,
 
 static int rockchip_headset_resume(struct platform_device *pdev)
 {
+	headset_resume();
 	if (pdata_info->chan != 0) {
 		return rk_headset_adc_resume(pdev);
 	}

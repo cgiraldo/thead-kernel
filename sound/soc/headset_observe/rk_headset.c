@@ -467,6 +467,13 @@ out:
 	return;
 }
 
+void headset_resume(void)
+{
+	schedule_delayed_work(&headset_info->h_delayed_work[HEADSET],
+			      msecs_to_jiffies(10));
+}
+EXPORT_SYMBOL_GPL(headset_resume);
+
 #ifdef CONFIG_HAS_EARLYSUSPEND
 static void headset_early_resume(struct early_suspend *h)
 {

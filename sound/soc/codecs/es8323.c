@@ -129,10 +129,12 @@ struct es8323_priv {
 	struct clk *mclk;
 	struct snd_pcm_hw_constraint_list sysclk_constraints;
 	struct snd_soc_component *component;
+	struct delayed_work pa_work;
 	struct regmap *regmap;
 	struct device_node *np;
 	struct gpio_desc * hp_ctl_gpio;
 	struct gpio_desc * spk_ctl_gpio;
+	bool playback;
 };
 
 static int es8323_codec_ctl_gpio(struct es8323_priv *es8323,
@@ -167,11 +169,14 @@ static int es8323_headset_switch(struct notifier_block *nb,
                 snd_soc_component_write(g_es8323->component, ES8323_ADCCONTROL2, 0x00);
                 es8323_codec_ctl_gpio(g_es8323, CODEC_SET_SPK, 0);
                 es8323_codec_ctl_gpio(g_es8323, CODEC_SET_HP, 1);
-        } else {
+        } else if (g_es8323->playback) {
                 snd_soc_component_write(g_es8323->component, ES8323_ADCCONTROL2, 0x50);
                 es8323_codec_ctl_gpio(g_es8323, CODEC_SET_SPK, 1);
                 es8323_codec_ctl_gpio(g_es8323, CODEC_SET_HP, 0);
-        }
+        } else {
+                es8323_codec_ctl_gpio(g_es8323, CODEC_SET_SPK, 0);
+                es8323_codec_ctl_gpio(g_es8323, CODEC_SET_HP, 0);
+    }
 
         return NOTIFY_OK;
 }
@@ -767,6 +772,7 @@ static int es8323_pcm_startup(struct snd_pcm_substream *substream,
 	}
 #endif
 
+	es8323->playback = false;
 	switch (substream->stream)
 	{
 	case SNDRV_PCM_STREAM_CAPTURE:
@@ -782,17 +788,8 @@ static int es8323_pcm_startup(struct snd_pcm_substream *substream,
 		break;
 
 	case SNDRV_PCM_STREAM_PLAYBACK:
-		#ifdef CONFIG_RK_HEADSET
-		if(!rk_headset_get_headset()) {
-			DBG("get headset out \n");
-			es8323_codec_ctl_gpio(es8323, CODEC_SET_SPK, 1);
-			es8323_codec_ctl_gpio(es8323, CODEC_SET_HP, 0);
-		} else {
-			DBG("get headset in \n");
-			es8323_codec_ctl_gpio(es8323, CODEC_SET_SPK, 0);
-			es8323_codec_ctl_gpio(es8323, CODEC_SET_HP, 1);
-		}
-		#endif
+		es8323->playback = true;
+		schedule_delayed_work(&es8323->pa_work, msecs_to_jiffies(20));
 		break;
 
 	default:
@@ -1169,6 +1166,23 @@ static int es8323_codec_parse_dt_property(struct device *dev,
 	return 0;
 }
 
+static void pa_delay_worker(struct work_struct *work)
+{
+	struct es8323_priv *es8323 = container_of(work, struct es8323_priv, pa_work.work);
+
+	#ifdef CONFIG_RK_HEADSET
+	if(!rk_headset_get_headset()) {
+		DBG("get headset out \n");
+		es8323_codec_ctl_gpio(es8323, CODEC_SET_SPK, 1);
+		es8323_codec_ctl_gpio(es8323, CODEC_SET_HP, 0);
+	} else {
+		DBG("get headset in \n");
+		es8323_codec_ctl_gpio(es8323, CODEC_SET_SPK, 0);
+		es8323_codec_ctl_gpio(es8323, CODEC_SET_HP, 1);
+	}
+	#endif
+}
+
 static int es8323_i2c_probe(struct i2c_client *i2c,
 			    const struct i2c_device_id *id)
 {
@@ -1189,6 +1203,8 @@ static int es8323_i2c_probe(struct i2c_client *i2c,
 	if (!es8323)
 		return -ENOMEM;
 
+	es8323->playback = false;
+	INIT_DELAYED_WORK(&es8323->pa_work, pa_delay_worker);
 	es8323->regmap = devm_regmap_init_i2c(i2c, &es8323_regmap_config);
 	if (IS_ERR(es8323->regmap))
 		return PTR_ERR(es8323->regmap);

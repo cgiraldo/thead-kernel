@@ -45,4 +45,5 @@ int rk_headset_adc_probe(struct platform_device *pdev,
 int rk_headset_adc_suspend(struct platform_device *pdev, pm_message_t state);
 int rk_headset_adc_resume(struct platform_device *pdev);
 int rk_headset_get_headset(void);
+void headset_resume(void);
 #endif
