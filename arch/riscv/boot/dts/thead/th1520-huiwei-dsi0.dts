@@ -3,7 +3,7 @@
  * Copyright (C) 2022 Alibaba Group Holding Limited.
  */
 
-#include "th1520-lpi4a.dtsi"
+#include "th1520-huiwei.dtsi"
 
 / {
 	model = "T-HEAD Light Lichee Pi 4A configuration for 8GB DDR board";
@@ -157,3 +157,5 @@
                 };
 	};
 };
+
+/delete-node/ &iso7816;

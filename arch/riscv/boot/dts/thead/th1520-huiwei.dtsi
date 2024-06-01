@@ -1553,19 +1553,6 @@
 	status = "disabled";
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_i2c3>;
-
-	touch@14 {
-		#gpio-cells = <2>;
-		compatible = "goodix,gt9271";
-		reg = <0x14>;
-		interrupt-parent = <&ao_gpio_porta>;
-		interrupts = <3 0>;
-		irq-gpios = <&ao_gpio_porta 3 0>;
-		reset-gpios = <&pcal6408ahk_d 0 0>;
-		AVDD28-supply = <&reg_tp_pwr_en>;
-		tp-size = <9271>;
-		status = "disable";
-	};
 };
 
 &i2c4 {
@@ -1916,20 +1903,6 @@
 			dsi0_out: endpoint {
 				remote-endpoint = <&panel0_in>;
 			};
-		};
-	};
-
-	panel0@0 {
-		reg = <0>;
-		backlight = <&lcd0_backlight>;
-		reset-gpio = <&pcal6408ahk_d 7 0>; /* active low */
-		hsvcc-supply = <&soc_vdd18_lcd0_en_reg>;
-		vspn3v3-supply = <&soc_vdd33_lcd0_en_reg>;
-
-		port {
-				panel0_in: endpoint {
-						remote-endpoint = <&dsi0_out>;
-				};
 		};
 	};
 };

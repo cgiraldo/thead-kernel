@@ -5,7 +5,7 @@
 
 /dts-v1/;
 
-#include "th1520-huiwei.dtsi"
+#include "th1520-huiwei-dsi0.dts"
 
 &lightsound {
         status = "okay";
@@ -29,4 +29,12 @@
                         sound-dai = <&dummy_codec>;
                 };
         };
+};
+
+&dpu_enc0 {
+        status = "okay";
+};
+
+&dsi0 {
+        status = "okay";
 };
