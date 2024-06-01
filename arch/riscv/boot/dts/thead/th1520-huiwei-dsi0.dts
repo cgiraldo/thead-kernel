@@ -1,0 +1,33 @@
+/* SPDX-License-Identifier: GPL-2.0 */
+/*
+ * Copyright (C) 2022-2023 Alibaba Group Holding Limited.
+ */
+
+#include "th1520-huiwei.dtsi"
+
+/ {
+	model = "T-HEAD Light Lichee Pi 4A configuration for 8GB DDR board";
+	compatible = "thead,light-val", "thead,light-lpi4a", "thead,light";
+};
+
+&i2c3 {
+	touch@14 {
+		touchscreen-size-x = <800>;
+		touchscreen-size-y = <1200>;
+		status = "okay";
+	};
+};
+
+&dsi0 {
+        status = "okay";
+};
+
+&dpu_enc0 {
+	status = "okay";
+};
+
+&dhost_0 {
+	panel0@0 {
+		compatible = "chongzhou,cz101b4001", "jadard,jd9365da-h3";
+	};
+};
