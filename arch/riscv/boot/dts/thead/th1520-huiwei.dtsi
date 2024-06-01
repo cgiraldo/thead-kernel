@@ -391,19 +391,6 @@
 		compatible = "gpio-keys";
 		pinctrl-0 = <&pinctrl_volume &pinctrl_pw>;
 		pinctrl-names = "default";
-		key-volumedown {
-			label = "Volume Down Key";
-			linux,code = <KEY_VOLUMEDOWN>;
-			debounce-interval = <1>;
-			gpios = <&gpio1_porta 19 0x1>;
-		};
-		key-volumeup {
-			label = "Volume Up Key";
-			linux,code = <KEY_VOLUMEUP>;
-			debounce-interval = <1>;
-			gpios = <&gpio2_porta 25 0x1>;
-		};
-
 		kkey-pw{
 			label = "power Key";
 			wakeup-source;
