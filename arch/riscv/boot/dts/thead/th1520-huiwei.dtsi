@@ -276,6 +276,7 @@
 		#cooling-cells = <2>;
 		pwms = <&pwm 1 10000000 0>;
 		cooling-levels = <0 64 192 255>;
+		status = "disabled";
 	};
 
 	reg_vref_1v8: regulator-adc-verf {
