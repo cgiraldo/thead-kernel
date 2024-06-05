@@ -566,6 +566,7 @@ int get_tcpm_port_polarity(struct tcpm_port *port)
 {
 	return port->polarity;
 }
+EXPORT_SYMBOL_GPL(get_tcpm_port_polarity);
 
 static bool tcpm_port_is_disconnected(struct tcpm_port *port)
 {
