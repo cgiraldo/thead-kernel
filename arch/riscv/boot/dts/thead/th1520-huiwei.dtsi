@@ -13,7 +13,7 @@
 #include "th1520-vi-devices.dtsi"
 
 / {
-	model = "T-HEAD Light Lichee Pi 4A board";
+	model = "TH1520 HuiweiBook";
 	compatible = "thead,light-val", "thead,light-lpi4a", "thead,light";
 
 	memory@0 {

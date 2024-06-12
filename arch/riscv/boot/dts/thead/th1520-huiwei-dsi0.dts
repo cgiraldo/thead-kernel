@@ -6,7 +6,7 @@
 #include "th1520-huiwei.dtsi"
 
 / {
-	model = "T-HEAD Light Lichee Pi 4A configuration for 8GB DDR board";
+	model = "TH1520 Huiweibook";
 	compatible = "thead,light-val", "thead,light-lpi4a", "thead,light";
 
 	memory@0 {
